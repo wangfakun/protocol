@@ -1,2 +1,5 @@
 1、network protocol wiki introduce
 https://en.wikipedia.org/wiki/Tunneling_protocol
+
+2、http协议详解
+第七章 缓存
