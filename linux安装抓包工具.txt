@@ -1,0 +1,8 @@
+
+1 yum install wireshark
+2 yum search wireshark
+3 yum install wireshark-gnome
+4 windows 配置安装xming工具 去官网下载
+5 配置ximng launch 
+6 配置ssh客户端工具 xll 选中
+7 配置 、etc/ssh/sshd_config 将 AllowTcpForwarding yes X11Forwarding yes
