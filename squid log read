@@ -1,3 +1,103 @@
+在日常运维工作中，只要用到squid缓存服务，就会常常被要求清理squid缓存。
+比如公司领导要求删一篇新闻，新闻是生成的静态。运维人员把服务器上静态的新闻页面删除了后，不料代理服务器上缓存还有。
+缓存服务器如果用的是suqid，下面就对清理squid缓存的方法做一梳理：
+
+
+（1）首先在squid的主配置文件中添加acl 列表，并允许受信任的主机有权限清除缓存。
+[root@hqtime ~]# vim /etc/squid/squid.conf
+.......
+.......
+acl managercache src 192.168.1.145 127.0.0.1
+acl Purge method PURGE
+http_access allow managercache Purge
+http_access deny Purge
+
+（2）使用squid自带命令squidclient
+如下清除squid中一条缓存,-h是受信任清理缓存的服务器ip，－p是指定的squid端口
+[root@hqtime ~]# /usr/bin/squidclient -h 192.168.1.145 -p 80 -m PURGE http://www.linuxidc.com/404.html
+或者
+[root@hqtime ~]# /usr/bin/squidclient -p 80 -m PURGE http://www.linuxidc.com/404.html
+-------------------------------------------------------
+获取所有缓存 *.jpg 的信息
+[root@hqtime ~]# /usr/bin/squidclient -p 80 mgr:objects | grep jpg
+
+取得squid运行状态信息
+[root@hqtime ~]# /usr/bin/squidclient -p 80 mgr:info
+
+取得squid内存使用情况
+[root@hqtime ~]# /usr/bin/squidclient -p 80 mgr:mem
+
+取得squid已经缓存的列表(小心使用此命令 可能导致崩溃)： 
+[root@hqtime ~]# /usr/bin/squidclient -p 80 mgr:objects
+
+取得squid的磁盘使用情况： 
+[root@hqtime ~]# /usr/bin/squidclient -p 80 mgr:diskd
+
+强制更新某个url：
+[root@hqtime ~]# /usr/bin/squidclient -p 80 -m PURGE http://www.yejr.com/static.php
+-------------------------------------------------------
+
+
+（3）通过脚本删除
+比如编写删除squid缓存的脚本clear_squid_cache.sh，如下：
+[root@hqtime ~]# vim clear_squid_cache.sh
+#!/bin/sh
+squidcache_path="/data1/squid/var/cache"
+squidclient_path="/usr/bin/squidclient"
+grep -a -r $1 $squidcache_path/* | strings | grep "http:" | awk -F'http:' '{print "http:"$2;}' > cache_list.txt
+for url in `cat cache_list.txt`; do
+$squidclient_path -m PURGE -p 80 $url
+done
+
+[root@hqtime ~]# chmod 755 clear_squid_cache.sh ＃赋予脚本可执行权限
+
+注意：脚本中的下面两个设置：
+squidcache_path= 表示squid缓存目录的路径，这个在squid.conf配置文件中可以查到
+squidclient_path= 表示squidclient程序所在的路径，默认为squid安装目录下的bin/squidclient
+-p 是指定squid 监听的端口
+
+用法：
+清除所有Flash缓存（扩展名.swf）：
+[root@hqtime ~]# sh clear_squid_cache.sh swf
+
+清除URL中包含sina.com.cn的所有缓存：
+[root@hqtime ~]# sh clear_squid_cache.sh sina.com.cn
+
+清除文件名为huanqiu.jpg的所有缓存：
+[root@hqtime ~]# sh clear_squid_cache.sh huanqiu.jpg
+
+如果对于频繁更新的gif或者什么，可以在crontab中添加对应的命令行
+假设上述脚本在/root目录下。如下：
+[root@hqtime ~]# crontab －e 
+0 * * * * /bin/bash /root/clear_squid_cache.sh gif &
+这样就会每隔一个小时进行一次刷新操作了，很是方便
+如果需要让图片更新人员自行刷新的话，就可以找相应的人员开发web页面，进行对脚本的调用就可以了
+
+脚本效率：
+经测试，此脚本清除26000个缓存文件用时2分钟左右，平均每秒可清除缓存文件177个。
+
+
+（4）还有一种方法，直接删除squid的缓存目录，这样就删除了squid的全部缓存了！
+然后重新创建同名空目录做为缓存目录，接着squid －z重新初始化，最后重启squid即可！
+
+查看squid.conf配置文件，比如缓存目录是/data1/squid/var/cache（cache_dir后面设置的）
+[root@hqtime ~]# rm －rf /data1/squid/var/cache
+
+[root@hqtime ~]# squid -z
+
+[root@hqtime ~]# /etc/init.d/squid restart
+
+ 
+
+
+
+
+
+
+
+
+
+
 可以使用上面的方法，大约的分析一下命令中比。什么意思就看下面的详解.
 #cat /var/log/squid/access.log |grep TCP_MEM_HIT
 如果看到很多的TCP_MEM_HIT ，这表明该文件是从内存缓存读取的，squid已经起作用了！你再用浏览器打开该文件，应该是快如闪电了。。呵呵，大功告成了！还有其他类型的HIT，如TCP_HIT等等，这些是从磁盘读取的，我觉得加速的意义不大，只不过缓解了apache的压力而已。
