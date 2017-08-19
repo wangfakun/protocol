@@ -3,3 +3,22 @@ https://en.wikipedia.org/wiki/Tunneling_protocol
 
 2、http协议详解
 第七章 缓存
+  1) 试验Expries 和 Cache-Control  max-age的过期日期控制
+  2）试验下If-Modify-Since 和 Last-Modify的时间新鲜度检测 
+  3）试验下If-None-Match 和Etag  的版本新鲜度检测 包括弱新鲜度检测
+  4）试验下两个新鲜度检测条件下共同使用的情况下的结果
+  5）试验下过期日期和新鲜度检测一起使用的情况
+  6）试验下no-store响应头，请求和响应的交互结果是怎么样
+  7）试验下Cache-Control: no-cache以及 Pragma:no-cache 响应头，请求和响应的交互结果是怎么样
+  8)试验下Cache-Control: no-cache 以及和Cache-Control:must-revalidate的区别
+     no-cache: 告诉浏览器、缓存服务器，不管本地副本是否过期，使用资源副本前，一定要到源服务器进行副本有效性校验。
+     must-revalidate：告诉浏览器、缓存服务器，本地副本过期前，可以使用本地副本；本地副本一旦过期，必须去源服务器进行有效性校验。
+  9）试验下缓存的控制的优先级顺序 no-store no-cache must-revalidate  max-age Expries
+  10)试验下在没有max-age Expries 过期的响应情况下 缓存的试探性过期算法是如何设置以及原理
+     1、通常情况下的默认算法 
+     2、如何连最后修改的日期都没有，如何设置默认的过期时间 
+     3、设置默认的过期时间为0是一种怎样的现象
+    
+   
+ 
+  
