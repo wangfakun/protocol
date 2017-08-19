@@ -4,6 +4,7 @@ https://en.wikipedia.org/wiki/Tunneling_protocol
 2、http协议详解
 第七章 缓存
   1) 试验Expries 和 Cache-Control  max-age的过期日期控制
+  
   2）试验下If-Modify-Since 和 Last-Modify的时间新鲜度检测 
   3）试验下If-None-Match 和Etag  的版本新鲜度检测 包括弱新鲜度检测
   4）试验下两个新鲜度检测条件下共同使用的情况下的结果
@@ -18,7 +19,9 @@ https://en.wikipedia.org/wiki/Tunneling_protocol
      1、通常情况下的默认算法 
      2、如何连最后修改的日期都没有，如何设置默认的过期时间 
      3、设置默认的过期时间为0是一种怎样的现象
-    
-   
+  11）客户端-浏览器如何进行新鲜度的控制
+  12）html的http-equiv标签控制响应首部的使用以及其缺陷
+  
+  
  
   
