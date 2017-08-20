@@ -21,7 +21,6 @@ https://en.wikipedia.org/wiki/Tunneling_protocol
      3、设置默认的过期时间为0是一种怎样的现象
   11）客户端-浏览器如何进行新鲜度的控制
   12）html的http-equiv标签控制响应首部的使用以及其缺陷
-  
-  
+  13) 动态内容如何设置响应头
  
   
